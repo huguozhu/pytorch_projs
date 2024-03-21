@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34622.214
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "Toturial_1", "Toturial_1.pyproj", "{8E18E7BD-5D8D-4772-929A-9021CEE56CD5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8E18E7BD-5D8D-4772-929A-9021CEE56CD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E18E7BD-5D8D-4772-929A-9021CEE56CD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4AFF859F-C2D2-4EEC-8E58-B1E08B7E0345}
+	EndGlobalSection
+EndGlobal
