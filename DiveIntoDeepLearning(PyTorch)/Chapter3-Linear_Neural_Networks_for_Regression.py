@@ -5,6 +5,7 @@ import numpy as np
 import torch
 from d2l import torch as d2l
 import random
+from torch import nn
 
 # ========== 概念 ==========
 # 数学期望: 随机变量的平均值
@@ -29,7 +30,7 @@ def Test_Vectorization_for_Speed() :
     print("t1 = ", t1)
     print("t2 = ", t2)
     
-# 3.1.3 计算正态分布(高斯分布)
+# ========== 3.1.3 计算正态分布(高斯分布) ==========
 # param: 
 #   x:      数据源
 #   mu:     数学期望
@@ -46,7 +47,7 @@ def Test_Normal():
              ylabel='p(x)', figsize=(4.5, 2.5),
              legend=[f'mean {mu}, std {sigma}' for mu, sigma in params])
     
-# 3.2 线性回归--从零开始实现
+# ========== 3.2 线性回归--从零开始实现 ==========
 # 3.2.1 生成数据集
 def synthetic_data(w, b, num_examples):  #@save
     """生成y=Xw+b+噪声"""    
@@ -67,6 +68,7 @@ def data_iter(batch_size, features, labels):
         batch_indices = torch.tensor(
             indices[i: min(i + batch_size, num_examples)])
         yield features[batch_indices], labels[batch_indices]
+      
 def Test_data_iter():
     w = np.array([2, -3.4])
     b = 4.2
@@ -76,10 +78,83 @@ def Test_data_iter():
         print(X, '\n', y)
         break
 
+# 定义线性回归模型
+def linreg(X, w, b):  #@save
+    """线性回归模型"""
+    return torch.matmul(X, w) + b
+# 定义损失函数loss
+def squared_loss(y_hat, y):  #@save
+    """均方损失"""
+    return (y_hat - y.reshape(y_hat.shape)) ** 2 / 2
+# 定义优化算法
+def sgd(params, lr, batch_size):  #@save
+    """小批量随机梯度下降"""
+    with torch.no_grad():
+        for param in params:
+            param -= lr * param.grad / batch_size
+            param.grad.zero_()
+  
+
+# 使用自己的代码实现线性回归
+def Linear_Regression_Scratch():
+    true_w = torch.tensor([2, -3.4])
+    true_b = 4.2
+    features, labels = d2l.synthetic_data(true_w, true_b, 1000)
 
 
+# ========== 3.3 线性回归的简洁实现(使用PyTorch的API) ==========
+def Linear_Regression_Concise():    
+    # 1) 生成数据集
+    true_w = torch.tensor([2, -3.4])
+    true_b = 4.2
+    features, labels = d2l.synthetic_data(true_w, true_b, 1000)
+    
+    # 2) 读取数据集
+    # 使用PyTorch API来读取数据，功能同data_iter()函数
+    def load_array(data_arrays, batch_size, is_train=True):  #@save
+        """构造一个PyTorch数据迭代器"""
+        dataset =  torch.utils.data.TensorDataset(*data_arrays)
+        return torch.utils.data.DataLoader(dataset, batch_size, shuffle=is_train)   
+    batch_size = 10
+    data_iter = load_array((features, labels), batch_size)    
+    print(next(iter(data_iter)))
+    
+    # 3) 定义模型
+    net = nn.Sequential(nn.Linear(2, 1))
+    net[0].weight.data.normal_(0, 0.01)
+    net[0].bias.data.fill_(0)
+    
+    # 4) 定义损失函数 & 定义优化算法
+    #   计算均方误差使用MSELoss类，返回所有样本损失的平均值
+    #   优化算法：小批量随机梯度下降算法
+    loss = nn.MSELoss   
+    trainer = torch.optim.SGD(net.parameters(), lr=0.03)   
+    
+    # 5) 训练
+    num_epochs = 3
+    for epoch in range(num_epochs):
+        for X, y in data_iter : 
+            print("X = ", X)
+            print("y = ", y)
+            l = loss(net(X), y)
+            trainer.zero_grad()
+            l.backward()
+            trainer.step()
+        l = loss(net(features), labels)
+        print(f'epoch {epoch + 1}, loss {l:f}')
 
+    w = net[0].weight.data
+    print('w的估计误差：', true_w - w.reshape(true_w.shape))
+    b = net[0].bias.data
+    print('b的估计误差：', true_b - b)
+    
 # Run
 #Test_Vectorization_for_Speed()
 #Test_Normal()
-Test_data_iter
+#Test_data_iter
+#Linear_Regression_Scratch()
+Linear_Regression_Concise()
+
+
+
+            
