@@ -1,11 +1,11 @@
-﻿import torch
-
+﻿# ========== 预备知识 ==========
+import torch
 import numpy as np
 from matplotlib_inline import backend_inline
 from d2l import torch as d2l
 from torch.distributions import multinomial
 
-# Part1: 线性代数
+# 2.3: 线性代数
 def Test_Linear() :
     print("==== 线性代数 ====")
     a = torch.arange(12, dtype=torch.float32).reshape(3, 4)
@@ -35,9 +35,9 @@ def Test_Linear() :
     print(torch.norm(u))
 
  
-# 2: 微积分
+# 2.4: 微积分
 
-# 2.1: 计算导数: 计算y=3x**2-4x在x=1处的导数
+# 2.4.1: 计算导数: 计算y=3x**2-4x在x=1处的导数
 def f(x):
     return 3*x**2 - 4*x
 def numerical_lim(f, x, h):
@@ -49,13 +49,13 @@ def Test_Differentiation() :
         print(f'h={h:.5f}, numerical limit={numerical_lim(f, 1, h):.5f}')
         h *= 0.1
 
-# 2.2: 计算偏导数
+# 2.4.2: 计算偏导数
 
-# 2.3: 梯度：梯度的本意是一个向量，表示某一函数在该点处的方向导数沿着该方向取得最大值，
+# 2.4.3: 梯度：梯度的本意是一个向量，表示某一函数在该点处的方向导数沿着该方向取得最大值，
 #           即函数在该点处沿着该方向（此梯度的方向）变化最快，变化率最大（为该梯度的模）。    
 #      计算：函数f()的梯度，即包含n个偏导数的向量
 
-# 2.4 链式法则
+# 2.4.4 链式法则
         
 def use_svg_display(): #@save
     backend_inline.set_matplotlib_formats('svg')
@@ -137,8 +137,8 @@ def Test_Auto_Differentiation() :
     print(x.grad)
     print(x.grad == u)
 
-# 3. 概率
-# 3.1: 采样    
+# 2.6. 概率和统计
+# 2.6.1: 采样    
 def Test_Sample():
     print("==== 概率 ====")
     count = 100000

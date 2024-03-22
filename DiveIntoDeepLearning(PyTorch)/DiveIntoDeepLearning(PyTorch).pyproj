@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>4ad362ec-7575-4c62-b5df-b4425090003b</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>DiveIntoDeepLearning_PyTorch_.py</StartupFile>
+    <StartupFile>Chapter3-Linear_Neural_Networks_for_Regression.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -21,7 +21,8 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="DiveIntoDeepLearning_PyTorch_.py" />
+    <Compile Include="Chapter2-Preliminaries.py" />
+    <Compile Include="Chapter3-Linear_Neural_Networks_for_Regression.py" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
