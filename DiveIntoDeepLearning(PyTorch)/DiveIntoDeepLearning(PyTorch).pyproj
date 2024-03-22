@@ -2,15 +2,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>8e18e7bd-5d8d-4772-929a-9021cee56cd5</ProjectGuid>
+    <ProjectGuid>4ad362ec-7575-4c62-b5df-b4425090003b</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>Toturial_1.py</StartupFile>
+    <StartupFile>DiveIntoDeepLearning_PyTorch_.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
-    <Name>Toturial_1</Name>
-    <RootNamespace>Toturial_1</RootNamespace>
+    <Name>DiveIntoDeepLearning(PyTorch)</Name>
+    <RootNamespace>DiveIntoDeepLearning(PyTorch)</RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,7 +21,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Toturial_1.py" />
+    <Compile Include="DiveIntoDeepLearning_PyTorch_.py" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

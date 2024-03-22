@@ -3,6 +3,7 @@
 import numpy as np
 from matplotlib_inline import backend_inline
 from d2l import torch as d2l
+from torch.distributions import multinomial
 
 # Part1: 线性代数
 def Test_Linear() :
@@ -137,11 +138,36 @@ def Test_Auto_Differentiation() :
     print(x.grad == u)
 
 # 3. 概率
+# 3.1: 采样    
+def Test_Sample():
+    print("==== 概率 ====")
+    count = 100000
+    fair_probs = torch.ones([6]) / 6
+    p1 = multinomial.Multinomial(count, fair_probs).sample()/count
+    print(p1)
+
+    p2 = multinomial.Multinomial(10, fair_probs).sample((5,))
+    print(p2)
+    cum_counts = p2.cumsum(dim=0)
+    print(cum_counts)
+    
+    print(cum_counts.sum(dim=1, keepdims=True))
+    
+    estimates = cum_counts / cum_counts.sum(dim=1, keepdims=True)
+    print(estimates)
+    
+# 3.2: 期望(求平均值)和方差
+def Test_Expectation():
+    x = 1
+    
+def Test_Variance():
+    x = 1
 
 # Main
 #Test_Linear()
 #Test_Differentiation()
 #Test_Show_Differentiation()
 #Test_Auto_Differentiation()
+#Test_Sample()    
     
 
