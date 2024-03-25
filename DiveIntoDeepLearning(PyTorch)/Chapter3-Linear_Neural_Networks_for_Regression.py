@@ -4,6 +4,7 @@ import time
 import numpy as np
 import torch
 from d2l import torch as d2l
+from torch.utils import data
 import random
 from torch import nn
 
@@ -11,8 +12,10 @@ from torch import nn
 # 数学期望: 随机变量的平均值
 # 方差：每个样本值预全体样本平均数差的平方的平均值
 
-# ========== 代码 ==========
-# 3.1 线性回归 Linear Regression
+
+
+
+# ========== 3.1 线性回归 ==========
 # 3.1.2 矢量化加速: 使用矢量计算，比用for速度快很多
 def Test_Vectorization_for_Speed() :
     n = 1000000
@@ -30,7 +33,7 @@ def Test_Vectorization_for_Speed() :
     print("t1 = ", t1)
     print("t2 = ", t2)
     
-# ========== 3.1.3 计算正态分布(高斯分布) ==========
+# 3.1.3 计算正态分布(高斯分布)
 # param: 
 #   x:      数据源
 #   mu:     数学期望
@@ -47,18 +50,23 @@ def Test_Normal():
              ylabel='p(x)', figsize=(4.5, 2.5),
              legend=[f'mean {mu}, std {sigma}' for mu, sigma in params])
     
+
+
+
+
+
+    
 # ========== 3.2 线性回归--从零开始实现 ==========
 # 3.2.1 生成数据集
 def synthetic_data(w, b, num_examples):  #@save
-    """生成y=Xw+b+噪声"""    
-    X = np.random.normal(0, 1, (num_examples, len(w)))      # 返回一组符合高斯分布的概率密度随机数
-    y = np.dot(X, w) + b
-    y += np.random.normal(0, 0.01, y.shape)
+    """生成y=Xw+b+噪声"""
+    X = torch.normal(0, 1, (num_examples, len(w)))      # 返回一组符合高斯分布的概率密度随机数
+    y = torch.matmul(X, w) + b
+    y += torch.normal(0, 0.01, y.shape)
     return X, y.reshape((-1, 1))
-
 # 3.2.2 读取数据集
 # 该函数接收批量大小、特征矩阵和标签向量作为输入，
-# 生成大小为batch_size的小批量。 每个小批量包含一组特征和标签。    
+# 生成大小为batch_size的小批量。 每个小批量包含一组特征和标签
 def data_iter(batch_size, features, labels):
     num_examples = len(features)
     indices = list(range(num_examples))
@@ -67,26 +75,17 @@ def data_iter(batch_size, features, labels):
     for i in range(0, num_examples, batch_size):
         batch_indices = torch.tensor(
             indices[i: min(i + batch_size, num_examples)])
-        yield features[batch_indices], labels[batch_indices]
-      
-def Test_data_iter():
-    w = np.array([2, -3.4])
-    b = 4.2
-    features, labels = synthetic_data(w, b, 1000)
-    batch_size = 10
-    for X, y in data_iter(batch_size, features, labels):
-        print(X, '\n', y)
-        break
+        yield features[batch_indices], labels[batch_indices]        
 
-# 定义线性回归模型
+# 3.2.4 定义线性回归模型
 def linreg(X, w, b):  #@save
     """线性回归模型"""
     return torch.matmul(X, w) + b
-# 定义损失函数loss
+# 3.2.5 定义损失函数loss
 def squared_loss(y_hat, y):  #@save
     """均方损失"""
     return (y_hat - y.reshape(y_hat.shape)) ** 2 / 2
-# 定义优化算法
+# 3.2.6 定义优化算法
 def sgd(params, lr, batch_size):  #@save
     """小批量随机梯度下降"""
     with torch.no_grad():
@@ -94,55 +93,84 @@ def sgd(params, lr, batch_size):  #@save
             param -= lr * param.grad / batch_size
             param.grad.zero_()
   
-
 # 使用自己的代码实现线性回归
 def Linear_Regression_Scratch():
+    # 1.生成数据集    
     true_w = torch.tensor([2, -3.4])
     true_b = 4.2
-    features, labels = d2l.synthetic_data(true_w, true_b, 1000)
+    features, labels = synthetic_data(true_w, true_b, 1000)
+    # 2.读取数据集
+    batch_size = 10
+    for X, y in data_iter(batch_size, features, labels):
+        print(X, '\n', y)
+        break    
+    # 3.定义回归模型: 使用线性回归,并初始化参数
+    w = torch.normal(0, 0.01, size=(2,1), requires_grad=True)
+    b = torch.zeros(1, requires_grad=True)
+    # 4.训练
+    lr = 0.03
+    num_epochs = 3
+    net = linreg
+    loss = squared_loss
+    for epoch in range(num_epochs):
+        for X, y in data_iter(batch_size, features, labels):
+            l = loss(net(X, w, b), y)  # X和y的小批量损失
+            # 因为l形状是(batch_size,1)，而不是一个标量。l中的所有元素被加到一起，
+            # 并以此计算关于[w,b]的梯度
+            l.sum().backward()
+            sgd([w, b], lr, batch_size)  # 使用参数的梯度更新参数
+        with torch.no_grad():
+            train_l = loss(net(features, w, b), labels)
+            print(f'epoch {epoch + 1}, loss {float(train_l.mean()):f}')
+    # 5.结果
+    print(f'w的估计误差: {true_w - w.reshape(true_w.shape)}')
+    print(f'b的估计误差: {true_b - b}')
+
+
+
+
+
+
+
+
+
+
 
 
 # ========== 3.3 线性回归的简洁实现(使用PyTorch的API) ==========
 def Linear_Regression_Concise():    
-    # 1) 生成数据集
+    # 1.生成数据集
     true_w = torch.tensor([2, -3.4])
     true_b = 4.2
-    features, labels = d2l.synthetic_data(true_w, true_b, 1000)
-    
-    # 2) 读取数据集
-    # 使用PyTorch API来读取数据，功能同data_iter()函数
+    features, labels = d2l.synthetic_data(true_w, true_b, 1000)    
+    # 2.读取数据集
     def load_array(data_arrays, batch_size, is_train=True):  #@save
         """构造一个PyTorch数据迭代器"""
-        dataset =  torch.utils.data.TensorDataset(*data_arrays)
-        return torch.utils.data.DataLoader(dataset, batch_size, shuffle=is_train)   
+        dataset = data.TensorDataset(*data_arrays)
+        return data.DataLoader(dataset, batch_size, shuffle=is_train)
     batch_size = 10
     data_iter = load_array((features, labels), batch_size)    
-    print(next(iter(data_iter)))
-    
-    # 3) 定义模型
+    print(next(iter(data_iter)))    
+    # 3.定义模型
     net = nn.Sequential(nn.Linear(2, 1))
     net[0].weight.data.normal_(0, 0.01)
-    net[0].bias.data.fill_(0)
-    
-    # 4) 定义损失函数 & 定义优化算法
-    #   计算均方误差使用MSELoss类，返回所有样本损失的平均值
-    #   优化算法：小批量随机梯度下降算法
-    loss = nn.MSELoss   
-    trainer = torch.optim.SGD(net.parameters(), lr=0.03)   
-    
-    # 5) 训练
+    net[0].bias.data.fill_(0)    
+    # 4.定义损失函数
+    # 计算均方误差使用MSELoss类，返回所有样本损失的平均值 -- 默认用于计算两个输入对应元素差值平方和的均值    
+    loss = nn.MSELoss
+    # 5.定义优化算法--SGD优化算法：随机梯度下降算法
+    trainer = torch.optim.SGD(net.parameters(), lr=0.03)       
+    # 6.训练
     num_epochs = 3
     for epoch in range(num_epochs):
-        for X, y in data_iter : 
-            print("X = ", X)
-            print("y = ", y)
+        for X, y in data_iter :
             l = loss(net(X), y)
             trainer.zero_grad()
             l.backward()
             trainer.step()
         l = loss(net(features), labels)
         print(f'epoch {epoch + 1}, loss {l:f}')
-
+    # 7.结果
     w = net[0].weight.data
     print('w的估计误差：', true_w - w.reshape(true_w.shape))
     b = net[0].bias.data
@@ -151,9 +179,8 @@ def Linear_Regression_Concise():
 # Run
 #Test_Vectorization_for_Speed()
 #Test_Normal()
-#Test_data_iter
-#Linear_Regression_Scratch()
-Linear_Regression_Concise()
+Linear_Regression_Scratch()
+#Linear_Regression_Concise()
 
 
 
