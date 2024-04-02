@@ -79,5 +79,5 @@ def v43_Multilayer_preceptrons_Concise() :
 
 
 # ========== main ==========
-#v42_Multilayer_preceptrons_Scratch()
-v43_Multilayer_preceptrons_Concise()
+v42_Multilayer_preceptrons_Scratch()
+#v43_Multilayer_preceptrons_Concise()
