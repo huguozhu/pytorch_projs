@@ -176,7 +176,7 @@ def v54_Custom_Layers() :
 
 
 # ========== 5.5 读写文件 File IO  ==========   
-def v54_FileIO() :
+def v55_FileIO() :
     # 5.5.1 加载和保存张量
     x = torch.arange(4)
     print("x=", x)
@@ -217,12 +217,51 @@ def v54_FileIO() :
     print(Y_clone == Y)
 
 
+
+# ========== 5.6 多GPU  ==========   
+def try_gpu(i=0):  #@save
+    """如果存在，则返回gpu(i)，否则返回cpu()"""
+    if torch.cuda.device_count() >= i + 1:
+        return torch.device(f'cuda:{i}')
+    return torch.device('cpu')
+def try_all_gpus():  #@save
+    """返回所有可用的GPU，如果没有GPU，则返回[cpu(),]"""
+    devices = [torch.device(f'cuda:{i}')
+             for i in range(torch.cuda.device_count())]
+    return devices if devices else [torch.device('cpu')]
+def v56_GPUs() :
+    # 5.6.1 计算设备
+    print(torch.device('cpu'))
+    print(torch.device('cuda')) 
+    print(torch.device('cuda:1'))
+    print(torch.cuda.device_count())
+
+    # 5.6.2 张量和GPU
+    x = torch.tensor([1, 2, 3])
+    print(x.device)
+    print(x)
+    y = torch.ones(2, 3, device=torch.device(try_gpu()))
+    print(y.device)
+    # GPU间数据复制
+    X = torch.ones(2, 3, device=try_gpu(1))
+    Y = torch.rand(2, 3, device=try_gpu(0))
+    Z = X.cuda(0)   # 将GPU1中X的数据复制给到GPU0中的Z
+    
+    # 5.6.3. 神经网络与GPU
+    net = nn.Sequential(nn.Linear(3, 1))
+    net = net.to(device=try_gpu())      #将CPU中创建的神经网络放到GPU中
+    print(net[0].weight.data.device)
+
+
+
+
 # ========== main ==========
 if __name__ == '__main__':    
     #v51_test_layers_modules()
     #v52_Parameter_Management()
     #v54_Custom_Layers()
-    v54_FileIO()
+    #v55_FileIO()
+    v56_GPUs()
 
 
 
