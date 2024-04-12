@@ -10,7 +10,7 @@ from d2l import torch as d2l
 from torch.utils import data
 import random
 from torch import nn
-from matplotlib import pyplot as plot
+from matplotlib import pyplot as plt
 
 
 # ========== 3.1 线性回归 ==========
@@ -31,7 +31,7 @@ def v31_Linear_Regression() :
     t2 = f'{time.time() - t:.5f} sec'
     print("用for 消耗时间=", t1)
     print("矢量化加速消耗时间=", t2)
-    
+        
     # 3.1.3 计算正态分布(高斯分布)
     # param: 
     #   x:      数据源
@@ -43,14 +43,18 @@ def v31_Linear_Regression() :
 
     # 生成[-7,7],间距为0.01的数列
     x = np.arange(-7, 7, 0.01)
-    print(x)
     # Mean and standard deviation pairs
-    params = [(0, 1), (0, 2), (3, 1)]
-    d2l.plot(x, [Calc_Normal(x, mu, sigma) for mu, sigma in params], xlabel='x',
-            ylabel='p(x)', figsize=(4.5, 2.5),
-            legend=[f'mean {mu}, std {sigma}' for mu, sigma in params])
-    x=x
-
+    params = [(0, 1, 'red'), (0, 2, 'green'), (3, 1, 'blue')]
+    for mu, sigma, color in params :
+        plt.plot(x, Calc_Normal(x, mu, sigma), color=color, linewidth=3, label=[f'mean={mu}, std={sigma}'])
+    plt.legend(ncol=1)
+    plt.title('Gaussian Distribution')
+    plt.xlabel('x')
+    plt.ylabel('y')
+    plt.grid(True)
+    plt.show()
+    x = x
+    
 
 
     
@@ -170,8 +174,8 @@ def Linear_Regression_Concise():
 
 # ========== main ==========
 if __name__ == '__main__':
-    v31_Linear_Regression()
-    #Linear_Regression_Scratch()
+    #v31_Linear_Regression()
+    Linear_Regression_Scratch()
     #Linear_Regression_Concise()
 
 
