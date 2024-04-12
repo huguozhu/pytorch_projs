@@ -1,4 +1,7 @@
-﻿# ========== 线性神经网络 ==========
+﻿# ========== 概念 ==========
+# 数学期望: 随机变量的平均值
+# 方差：每个样本值预全体样本平均数差的平方的平均值
+# 概率密度 = 一段区间（事件的取值范围）的概率除以该区间的长度
 import math
 import time
 import numpy as np
@@ -7,17 +10,13 @@ from d2l import torch as d2l
 from torch.utils import data
 import random
 from torch import nn
-
-# ========== 概念 ==========
-# 数学期望: 随机变量的平均值
-# 方差：每个样本值预全体样本平均数差的平方的平均值
-
-
+from matplotlib import pyplot as plot
 
 
 # ========== 3.1 线性回归 ==========
-# 3.1.2 矢量化加速: 使用矢量计算，比用for速度快很多
-def Test_Vectorization_for_Speed() :
+def v31_Linear_Regression() :
+    # 3.1.2 矢量化加速: 使用矢量计算，比用for速度快很多
+    print("==== 矢量化加速 ====")
     n = 1000000
     a = torch.ones(n)
     b = torch.ones(n)
@@ -30,28 +29,27 @@ def Test_Vectorization_for_Speed() :
     t = time.time()
     d = a + b
     t2 = f'{time.time() - t:.5f} sec'
-    print("t1 = ", t1)
-    print("t2 = ", t2)
+    print("用for 消耗时间=", t1)
+    print("矢量化加速消耗时间=", t2)
     
-# 3.1.3 计算正态分布(高斯分布)
-# param: 
-#   x:      数据源
-#   mu:     数学期望
-#   sigma:  标准差    
-def Calc_Normal(x, mu, sigma) :
-    p = 1 / math.sqrt(2 * math.pi * sigma**2)
-    return p * np.exp(-0.5 * (x - mu)**2 / sigma**2)
-def Test_Normal():
-    # Use NumPy again for visualization
+    # 3.1.3 计算正态分布(高斯分布)
+    # param: 
+    #   x:      数据源
+    #   mu:     数学期望
+    #   sigma:  标准差    
+    def Calc_Normal(x, mu, sigma) :
+        p = 1 / math.sqrt(2 * math.pi * sigma**2)
+        return p * np.exp(-0.5 * (x - mu)**2 / sigma**2)
+
+    # 生成[-7,7],间距为0.01的数列
     x = np.arange(-7, 7, 0.01)
+    print(x)
     # Mean and standard deviation pairs
     params = [(0, 1), (0, 2), (3, 1)]
     d2l.plot(x, [Calc_Normal(x, mu, sigma) for mu, sigma in params], xlabel='x',
-             ylabel='p(x)', figsize=(4.5, 2.5),
-             legend=[f'mean {mu}, std {sigma}' for mu, sigma in params])
-    
-
-
+            ylabel='p(x)', figsize=(4.5, 2.5),
+            legend=[f'mean {mu}, std {sigma}' for mu, sigma in params])
+    x=x
 
 
 
@@ -77,7 +75,7 @@ def data_iter(batch_size, features, labels):
             indices[i: min(i + batch_size, num_examples)])
         yield features[batch_indices], labels[batch_indices]        
 
-# 3.2.4 定义线性回归模型
+# 3.2.4 定义线性回归模型: Y = w*X + b
 def linreg(X, w, b):  #@save
     """线性回归模型"""
     return torch.matmul(X, w) + b
@@ -129,14 +127,6 @@ def Linear_Regression_Scratch():
 
 
 
-
-
-
-
-
-
-
-
 # ========== 3.3 线性回归的简洁实现(使用PyTorch的API) ==========
 def Linear_Regression_Concise():    
     # 1.生成数据集
@@ -176,11 +166,13 @@ def Linear_Regression_Concise():
     b = net[0].bias.data
     print('b的估计误差：', true_b - b)
     
-# Run
-#Test_Vectorization_for_Speed()
-#Test_Normal()
-Linear_Regression_Scratch()
-#Linear_Regression_Concise()
+
+
+# ========== main ==========
+if __name__ == '__main__':
+    v31_Linear_Regression()
+    #Linear_Regression_Scratch()
+    #Linear_Regression_Concise()
 
 
 

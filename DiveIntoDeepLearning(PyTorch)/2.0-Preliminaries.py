@@ -5,16 +5,15 @@ from matplotlib_inline import backend_inline
 from d2l import torch as d2l
 from torch.distributions import multinomial
 
-# 2.3: 线性代数
-def Test_Linear() :
-    print("==== 线性代数 ====")
+# ========== 2.3: 线性代数 ==========
+def v23_Linear() :
+    print("==== 2.3 线性代数 ====")
     a = torch.arange(12, dtype=torch.float32).reshape(3, 4)
     b = torch.arange(12, dtype=torch.float32).new_ones(3, 4)
     print("a = ", a)
     print("b = ", b)
     c = a + b
     print("c = ",c)
-
 
     x = torch.tensor([
         [1, 2, 3, 4],
@@ -26,23 +25,20 @@ def Test_Linear() :
         [5, 6, 7, 8],
         [8, 7, 6, 5],
         [4, 3, 2, 1]])
-
     print("x * y(0) = ", x*y)
     print("x * y(1) = ", torch.mm(x, y))
-
-
     u = torch.tensor([3.0, -4.0])
     print(torch.norm(u))
 
  
-# 2.4: 微积分
-
+# ========== 2.4: 微积分 ==========
 # 2.4.1: 计算导数: 计算y=3x**2-4x在x=1处的导数
-def f(x):
-    return 3*x**2 - 4*x
-def numerical_lim(f, x, h):
-    return (f(x+h) - f(x)) / h
-def Test_Differentiation() :
+def v24_Differentiation() :
+    def f(x):
+        return 3*x**2 - 4*x
+    # 求函数f在x处的极限（h为无限接近0的数）
+    def numerical_lim(f, x, h): 
+        return (f(x+h) - f(x)) / h
     print("==== 手写求导数 ====")
     h = 0.1
     for i in range(5):
@@ -50,13 +46,10 @@ def Test_Differentiation() :
         h *= 0.1
 
 # 2.4.2: 计算偏导数
-
 # 2.4.3: 梯度：梯度的本意是一个向量，表示某一函数在该点处的方向导数沿着该方向取得最大值，
 #           即函数在该点处沿着该方向（此梯度的方向）变化最快，变化率最大（为该梯度的模）。    
 #      计算：函数f()的梯度，即包含n个偏导数的向量
-
-# 2.4.4 链式法则
-        
+# 2.4.4 链式法则： dy/dx = dy/du * du/dx
 def use_svg_display(): #@save
     backend_inline.set_matplotlib_formats('svg')
 def set_figsize(figsize=(3.5, 2.5)): #@save
@@ -106,8 +99,11 @@ def Test_Show_Differentiation():
     plot(x, [f(x), 2 * x - 3], 'x', 'f(x)', legend=['f(x)', 'Tangent line (x=1)'])
     
 
-# 2.5 自动求导
-def Test_Auto_Differentiation() :
+
+
+
+# ========== 2.5 自动求导 ==========
+def v25_Auto_Differentiation() :
     print("==== 用backward()自动求导 ====")
     x = torch.arange(4.0)
     x.requires_grad_(True)
@@ -137,37 +133,37 @@ def Test_Auto_Differentiation() :
     print(x.grad)
     print(x.grad == u)
 
-# 2.6. 概率和统计
+
+
+
+# ========== 2.6. 概率和统计 ==========
 # 2.6.1: 采样    
-def Test_Sample():
+def v26_Sample():
     print("==== 概率 ====")
     count = 100000
     fair_probs = torch.ones([6]) / 6
+    print("fair_probs=", fair_probs)
     p1 = multinomial.Multinomial(count, fair_probs).sample()/count
-    print(p1)
+    print("p1=", p1)
 
     p2 = multinomial.Multinomial(10, fair_probs).sample((5,))
-    print(p2)
+    print("p2=",p2)
     cum_counts = p2.cumsum(dim=0)
-    print(cum_counts)
+    print("cum_counts=",cum_counts)
     
     print(cum_counts.sum(dim=1, keepdims=True))
     
     estimates = cum_counts / cum_counts.sum(dim=1, keepdims=True)
     print(estimates)
     
-# 3.2: 期望(求平均值)和方差
-def Test_Expectation():
-    x = 1
-    
-def Test_Variance():
-    x = 1
 
-# Main
-#Test_Linear()
-#Test_Differentiation()
-#Test_Show_Differentiation()
-#Test_Auto_Differentiation()
-#Test_Sample()    
+
+
+# ========== main ==========
+if __name__ == '__main__':
+    #v23_Linear()
+    #v24_Differentiation()
+    #v25_Auto_Differentiation()
+    v26_Sample()
     
 
