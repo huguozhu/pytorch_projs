@@ -49,7 +49,7 @@ def v71_AlexNet() :
 
 
 # ========== 7.2. 使用块的网络（VGG）   ========== 
-def V72_VGG() :
+def V72_VGG_11() :
     # 带块的CNN（卷积神经网络）有三部分组成：
     #   1) 带填充以保持分辨率的卷积层
     #   2) 非线性激活函数，如ReLU
@@ -64,6 +64,7 @@ def V72_VGG() :
             layers.append(nn.Conv2d(in_channels, out_channels,
                                     kernel_size=3, padding=1))
             layers.append(nn.ReLU())
+            in_channels = out_channels
         layers.append(nn.MaxPool2d(kernel_size=2,stride=2))
         return nn.Sequential(*layers)
     # 7.2.2 VGG网络
@@ -83,24 +84,71 @@ def V72_VGG() :
             nn.Linear(out_channels * 7 * 7, 4096), nn.ReLU(), nn.Dropout(0.5),
             nn.Linear(4096, 4096), nn.ReLU(), nn.Dropout(0.5),
             nn.Linear(4096, 10))
+    
+    
+    conv_arch = ((1, 64), (1, 128), (2, 256), (2, 512), (2, 512))
+    # 打印VGG-11层结构：8个卷积层+3个全连接层
+    net = vgg(conv_arch)    
     X = torch.randn(size=(1, 1, 224, 224))
     for blk in net:
         X = blk(X)
         print(blk.__class__.__name__,'output shape:\t',X.shape)
 
     # 7.2.3 训练模型
-    conv_arch = ((1, 64), (1, 128), (2, 256), (2, 512), (2, 512))
     ratio = 4
     small_conv_arch = [(pair[0], pair[1] // ratio) for pair in conv_arch]
     net = vgg(small_conv_arch)
-    # 
     lr, num_epochs, batch_size = 0.05, 10, 128
     train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)
     d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())
 
 
 
+
+# ========== 7.3. 网络中的网络（NiN）   ========== 
+def V73_NiN() : 
+    # 定义NiN块
+    def nin_block(in_channels, out_channels, kernel_size, strides, padding):
+        return nn.Sequential(
+            nn.Conv2d(in_channels, out_channels, kernel_size, strides, padding),
+            nn.ReLU(),
+            nn.Conv2d(out_channels, out_channels, kernel_size=1), nn.ReLU(),
+            nn.Conv2d(out_channels, out_channels, kernel_size=1), nn.ReLU())
+    net = nn.Sequential(
+        nin_block(1, 96, kernel_size=11, strides=4, padding=0),
+        nn.MaxPool2d(3, stride=2),
+        nin_block(96, 256, kernel_size=5, strides=1, padding=2),
+        nn.MaxPool2d(3, stride=2),
+        nin_block(256, 384, kernel_size=3, strides=1, padding=1),
+        nn.MaxPool2d(3, stride=2),
+        nn.Dropout(0.5),
+        # 标签类别数是10
+        nin_block(384, 10, kernel_size=3, strides=1, padding=1),
+        nn.AdaptiveAvgPool2d((1, 1)),
+        # 将四维的输出转成二维的输出，其形状为(批量大小,10)
+        nn.Flatten())
+
+    # 答应NiN的输出
+    X = torch.rand(size=(1, 1, 224, 224))
+    for layer in net:
+        X = layer(X)
+        print(layer.__class__.__name__,'output shape:\t', X.shape)
+
+    # 训练
+    lr, num_epochs, batch_size = 0.1, 10, 128
+    train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)
+    d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())
+
+
+
+
+
+
 # ========== main ==========
 if __name__ == '__main__':
-    v71_AlexNet()
-    #V72_VGG()
+    #v71_AlexNet()
+    #V72_VGG_11()
+    V73_NiN()
+
+
+
