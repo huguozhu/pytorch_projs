@@ -87,7 +87,7 @@ def linreg(X, w, b):  #@save
 def squared_loss(y_hat, y):  #@save
     """均方损失"""
     return (y_hat - y.reshape(y_hat.shape)) ** 2 / 2
-# 3.2.6 定义优化算法
+# 3.2.6 定义优化算法：使用SGD-随机梯度下降（Stochastic Gradient Descent）
 def sgd(params, lr, batch_size):  #@save
     """小批量随机梯度下降"""
     with torch.no_grad():
