@@ -46,7 +46,6 @@ def v71_AlexNet() :
     
 
 
-    
 
 
 # ========== 7.2. 使用块的网络（VGG）   ========== 
@@ -103,5 +102,5 @@ def V72_VGG() :
 
 # ========== main ==========
 if __name__ == '__main__':
-    #v71_AlexNet()
-    V72_VGG()
+    v71_AlexNet()
+    #V72_VGG()

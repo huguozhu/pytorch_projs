@@ -9,57 +9,42 @@ import matplotlib.pyplot as plt
 d2l.use_svg_display()
 
 # ========== 3.5 图像分类数据 ==========
-def Download_FashionMNIST() :
+def v35_Show_Images() :
+    def Download_FashionMNIST() :
     # 通过ToTensor实例将图像数据从PIL类型变换成32位浮点数格式，
     # 并除以255使得所有像素的数值均在0～1之间
-    trans = transforms.ToTensor()
-    mnist_train = torchvision.datasets.FashionMNIST(
-        root="../data", train=True, transform=trans, download=True)
-    mnist_test = torchvision.datasets.FashionMNIST(
-        root="../data", train=False, transform=trans, download=True)
-    print("数据集数量=", len(mnist_train))
-    print("测试集数量=", len(mnist_test))
-    return [mnist_train, mnist_test]
-def load_data_fashion_mnist(batch_size, resize=None):  #@save
-    """下载Fashion-MNIST数据集，然后将其加载到内存中"""
-    trans = [transforms.ToTensor()]
-    if resize:
-        trans.insert(0, transforms.Resize(resize))
-    trans = transforms.Compose(trans)
-    mnist_train = torchvision.datasets.FashionMNIST(
-        root="../data", train=True, transform=trans, download=True)
-    mnist_test = torchvision.datasets.FashionMNIST(
-        root="../data", train=False, transform=trans, download=True)
-    return (data.DataLoader(mnist_train, batch_size, shuffle=True,
-                            num_workers=4),
-            data.DataLoader(mnist_test, batch_size, shuffle=False,
-                            num_workers=4))
+        trans = transforms.ToTensor()
+        mnist_train = torchvision.datasets.FashionMNIST(
+            root="../data", train=True, transform=trans, download=True)
+        mnist_test = torchvision.datasets.FashionMNIST(
+            root="../data", train=False, transform=trans, download=True)
+        print("数据集数量=", len(mnist_train))
+        print("测试集数量=", len(mnist_test))
+        return [mnist_train, mnist_test]
+    def get_fashion_mnist_labels(labels):  #@save
+        """返回Fashion-MNIST数据集的文本标签"""
+        text_labels = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
+                    'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
+        return [text_labels[int(i)] for i in labels]
+    def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):  #@save
+        """绘制图像列表"""
+        figsize = (num_cols * scale, num_rows * scale)
+        _, axes = plt.subplots(num_rows, num_cols, figsize=figsize)
 
-def get_fashion_mnist_labels(labels):  #@save
-    """返回Fashion-MNIST数据集的文本标签"""
-    text_labels = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
-                   'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
-    return [text_labels[int(i)] for i in labels]
-def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):  #@save
-    """绘制图像列表"""
-    figsize = (num_cols * scale, num_rows * scale)
-    _, axes = plt.subplots(num_rows, num_cols, figsize=figsize)
-
-    axes = axes.flatten()
-    for i, (ax, img) in enumerate(zip(axes, imgs)):
-        if torch.is_tensor(img):
-            # 图片张量
-            ax.imshow(img.numpy())
-        else:
-            # PIL图片
-            ax.imshow(img)
-        ax.axes.get_xaxis().set_visible(False)
-        ax.axes.get_yaxis().set_visible(False)
-        if titles:
-            ax.set_title(titles[i])
-    plt.show()
-    return axes
-def v35_Show_Images() :
+        axes = axes.flatten()
+        for i, (ax, img) in enumerate(zip(axes, imgs)):
+            if torch.is_tensor(img):
+                # 图片张量
+                ax.imshow(img.numpy())
+            else:
+                # PIL图片
+                ax.imshow(img)
+            ax.axes.get_xaxis().set_visible(False)
+            ax.axes.get_yaxis().set_visible(False)
+            if titles:
+                ax.set_title(titles[i])
+        plt.show()
+        return axes
     mnist_train, mnist_test = Download_FashionMNIST()
     X, y = next(iter(data.DataLoader(mnist_train, batch_size=18)))
     show_images(X.reshape(18, 28, 28), 2, 9, titles=get_fashion_mnist_labels(y));
@@ -119,7 +104,20 @@ class Animator:  #@save
         self.config_axes()
         d2l.display.display(self.fig)
         d2l.display.clear_output(wait=True)
-
+def load_data_fashion_mnist(batch_size, resize=None):  #@save
+    """下载Fashion-MNIST数据集，然后将其加载到内存中"""
+    trans = [transforms.ToTensor()]
+    if resize:
+        trans.insert(0, transforms.Resize(resize))
+    trans = transforms.Compose(trans)
+    mnist_train = torchvision.datasets.FashionMNIST(
+        root="../data", train=True, transform=trans, download=True)
+    mnist_test = torchvision.datasets.FashionMNIST(
+        root="../data", train=False, transform=trans, download=True)
+    return (data.DataLoader(mnist_train, batch_size, shuffle=True,
+                            num_workers=4),
+            data.DataLoader(mnist_test, batch_size, shuffle=False,
+                            num_workers=4))
 def v36_softmax_Regression_Scratch() :
     batch_size = 256
     train_iter, test_iter = load_data_fashion_mnist(batch_size)
@@ -128,9 +126,9 @@ def v36_softmax_Regression_Scratch() :
     num_outputs = 10
     W = torch.normal(0, 0.01, size=(num_inputs, num_outputs), requires_grad=True)
     b = torch.zeros(num_outputs, requires_grad=True)
-
+    # 测试维度0/1加法
     X = torch.tensor([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
-    X.sum(0, keepdim=True), X.sum(1, keepdim=True)
+    print(X.sum(0, keepdim=True), X.sum(1, keepdim=True))
 
     #实现softmax由三个步骤组成:
     #   对每个项求幂（使用exp）
@@ -140,9 +138,10 @@ def v36_softmax_Regression_Scratch() :
         X_exp = torch.exp(X)
         partition = X_exp.sum(1, keepdim=True)
         return X_exp / partition  # 这里应用了广播机制
+    # 测试softmax函数，和为1
     X = torch.normal(0, 1, (2, 5))
     X_prob = softmax(X)
-    X_prob, X_prob.sum(1)
+    print(X_prob, X_prob.sum(1))
 
     # 3.6.3 定义模型
     def net(X):
@@ -150,11 +149,14 @@ def v36_softmax_Regression_Scratch() :
     # 3.6.4 定义损失模型
     y = torch.tensor([0, 2])
     y_hat = torch.tensor([[0.1, 0.3, 0.6], [0.3, 0.2, 0.5]])
-    y_hat[[0, 1], y]
+    print(y_hat[[0, 0], y])
+    print(y_hat[[0, 1], y])
+    print(y_hat[[1, 0], y])
+    print(y_hat[[1, 1], y])
     #   实现交叉熵损失函数
     def cross_entropy(y_hat, y):
         return - torch.log(y_hat[range(len(y_hat)), y])
-    cross_entropy(y_hat, y)
+    print("交叉熵=", cross_entropy(y_hat, y))
 
     # 3.6.5 分类精度
     def accuracy(y_hat, y):  #@save
@@ -223,7 +225,7 @@ def v36_softmax_Regression_Scratch() :
 
     # 3.6.7 预测
     def predict_ch3(net, test_iter, n=6):  #@save
-        """预测标签（定义见第3章）"""
+        """预测标签(定义见第3章)"""
         for X, y in test_iter:
             break
         trues = d2l.get_fashion_mnist_labels(y)
@@ -233,13 +235,6 @@ def v36_softmax_Regression_Scratch() :
             X[0:n].reshape((n, 28, 28)), 1, n, titles=titles[0:n])
     predict_ch3(net, test_iter)
     a = 2
-
-
-
-
-
-
-
 
 
 
@@ -263,7 +258,9 @@ def v37_softmax_Regression_Concise() :
     a=2
 
 
+
+
 # ========== main ==========
 #v35_Show_Images()
-#v36_softmax_Regression_Scratch()
-v37_softmax_Regression_Concise()
+v36_softmax_Regression_Scratch()
+#v37_softmax_Regression_Concise()
