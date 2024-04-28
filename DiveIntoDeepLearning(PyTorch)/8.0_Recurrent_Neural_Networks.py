@@ -219,8 +219,6 @@ def V82_Convert_Text_to_Sequence() :
 
 
 
-
-
 # ========== 8.3 语言模型和数据集  ========== 
 def V83_Language_Model() :
     # 8.3.3 自然语言统计
@@ -327,6 +325,21 @@ def V83_Language_Model() :
         return data_iter, data_iter.vocab
 
     print("end")
+
+
+
+
+# ========== 8.5 循环神经网络-从零开始  ========== 
+def V85_RNN_from_scratch():
+    batch_size, num_steps = 32, 35
+    train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
+    F.one_hot(torch.tensor([0, 2]), len(vocab))
+
+
+
+
+
+
 
 # ========== main ==========
 if __name__ == '__main__':
