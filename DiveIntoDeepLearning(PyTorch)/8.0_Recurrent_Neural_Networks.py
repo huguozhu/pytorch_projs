@@ -331,11 +331,7 @@ def V83_Language_Model() :
 
 # ========== 8.5 循环神经网络-从零开始  ========== 
 def V85_RNN_from_scratch():
-    batch_size, num_steps = 32, 35
-    train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
-    F.one_hot(torch.tensor([0, 2]), len(vocab))
-
-
+    # none
 
 
 
@@ -345,7 +341,8 @@ def V85_RNN_from_scratch():
 if __name__ == '__main__':
     #V81_Sequences()
     #V82_Convert_Text_to_Sequence()
-    V83_Language_Model()
+    #V83_Language_Model()
+    V85_RNN_from_scratch()
 
 
 
